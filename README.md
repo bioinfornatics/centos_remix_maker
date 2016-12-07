@@ -8,7 +8,7 @@ The tool do not use a python library to parse command line option for compatibil
 Is really simple: 
 
 ```
-$ python centos_remix_maker/src/remix/main.py <ks.cfg> <myWorkDir> <verion> <arch> <myIsoName>
+$ python centos_remix_maker/src/remix/main.py <ks.cfg> <myWorkDir> <version> <arch> <myIsoName>
 ```
 
 All parameter are mandatory:

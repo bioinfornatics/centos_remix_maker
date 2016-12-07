@@ -19,7 +19,7 @@ def get_centos_mirror_list( version, arch ):
 
 #####################################
 def get_minimal_iso_url( url ):
-    filename    = find_item_from_url( url, lambda x : x.name == 'a' and  x["href"].endswith(".iso") and "minimal" in  x["href"]  )["href"]
+    filename    = find_item_from_url( url, lambda x : x.name == 'a' and  x["href"].endswith(".iso") and ("minimal" in  x["href"] or "Minimal" in  x["href"])  )["href"]
     return url + '/' + filename
 
 

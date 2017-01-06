@@ -7,27 +7,38 @@ from datetime   import date
 from tempfile   import mkstemp
 from shutil     import move
 import shlex
+import lzma
 
 
 def command( line, verbose = False, pass_exception = False ):
     if verbose:
-        print "Executing: " + line
+        print("Executing: ", line)
     p = Popen( shlex.split( line ) , stdout = PIPE, stderr = PIPE )
     out, err = p.communicate()
     if len(err) != 0 and not pass_exception:
-        for e in err.split( '\n' ):
-            stderr.write( "[Warning] " + e + '\n' )
+        for e in err.splitlines():
+            stderr.write( "[Warning] " + e.strip().decode('utf-8') + '\n' )
         raise Exception( "command failled: " + line  )
     return out
 
-
 def uncompress_bz2_file( compressedFile, outputFile ):
-    compressedFile  = compressedFile
     bzFile          = BZ2File( compressedFile, "rb", 20 * 4096)
-    data            = bzFile.read()
     with open( outputFile, "wb" ) as out:
-        out.write( data )
+        out.write( bzFile.read() )
 
+def uncompress_xz_file( compressedFile, outputFile ):
+    xzFile          = lzma.open( compressedFile, "rb")
+    with open( outputFile, "wb" ) as out:
+        out.write( xzFile.read() )
+
+def uncompress_file( compressedFile, outputFile ):
+    print(compressedFile)
+    if compressedFile.endswith("bz2"):
+        uncompress_bz2_file( compressedFile, outputFile )
+    elif compressedFile.endswith("xz"):
+        uncompress_xz_file( compressedFile, outputFile )
+    else:
+        raise Exception( "Unsupported format"+compressedFile )
 
 def mount_iso( isoFile, mountPoint ):
     command("mount -t iso9660 -o loop,ro {0} {1}".format( isoFile , mountPoint ), verbose = True )
@@ -44,6 +55,8 @@ def rm( glob_file ):
 
 
 def progress( current_value, max_value, msg ):
+    if max_value == 0:
+        max_value = 0.01
     percentage  = current_value * 100. / max_value
     message     = r"%s  [%3.2f%%]" % ( msg, percentage )
     status      = message + chr(8)*(len(message)+1)

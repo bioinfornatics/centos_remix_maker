@@ -38,14 +38,14 @@ def find_package( name, repodata_list ):
     pattern     = name + "-"
     iterator    = repodata_list.__iter__()
     repodata    = None
-    try: repodata    = iterator.next()
+    try: repodata    = iterator.__next__()
     except StopIteration: isSearching= False
     while isSearching:
         if repodata.repo.type == "http" and repodata.has_package( name ):
             isSearching = False
             repo        = repodata
         else:
-            try: repodata = iterator.next()
+            try: repodata = iterator.__next__()
             except StopIteration: isSearching= False
     if repo is None:
         stderr.write( "Package {0} not Found\n".format( name ) )
@@ -59,14 +59,14 @@ def find_group( group_name, repodata_list ):
     pattern     = group_name + "-"
     iterator    = repodata_list.__iter__()
     repodata    = None
-    try: repodata    = iterator.next()
+    try: repodata    = iterator.__next__()
     except StopIteration: isSearching= False
     while isSearching:
         if repodata.has_group( group_name ):
             isSearching = False
             repo        = repodata
         else:
-            try: repodata = iterator.next()
+            try: repodata = iterator.__next__()
             except StopIteration: isSearching= False
     if repo is None:
         stderr.write( "Group {0} not Found\n".format( group_name ) )
@@ -75,7 +75,7 @@ def find_group( group_name, repodata_list ):
 
 #####################################
 def extract_package_list( kickstart_path, repodata_list ):
-    print "Extacting packages choosen from kickstart"
+    print("Extacting packages choosen from kickstart")
     inPackageSection    = False
     isReading           = True
     packages            = set()
@@ -114,9 +114,9 @@ def get_existing_package( workdir ):
     for rpm in rpm_list:
         stdout = command( cmd + rpm, pass_exception = True )
         packages.add( stdout )
-        print progress( index,  len(rpm_list), msg ),
+        print(progress( index,  len(rpm_list), msg )),
         index += 1
-    print progress( index,  len(rpm_list), msg )
+    print(progress( index,  len(rpm_list), msg ))
 
     return packages
 
@@ -134,7 +134,7 @@ def get_missing_package( packagesNeed, packagesOrigin, repodata_list, verbose = 
             packagesNeed   |= repodata.get_package_dependencies( package )
         else:
             packagesNotFound.add( package )
-        if verbose: print progress( index,  len(packagesToDownload),msg ),
+        if verbose: print(progress( index,  len(packagesToDownload),msg )),
         index += 1
     max_value = len(packagesToDownload)
     if max_value == 0:
@@ -143,7 +143,7 @@ def get_missing_package( packagesNeed, packagesOrigin, repodata_list, verbose = 
         else:
             max_value   = 1
             index       = 1
-    if verbose: print progress( index,  max_value, msg )
+    if verbose: print(progress( index,  max_value, msg ))
 
     packagesToDownload = packagesNeed.difference( packagesOrigin )
     packagesToDownload = packagesToDownload.difference( packagesNotFound )
@@ -165,6 +165,6 @@ def download_packages(workdir, packagesToDownload, repodata_list ):
                 for url in repodata.get_package_url( package ):
                     u = repodata.repo.baseurl + url
                     download_file( u, packages_dir )
-        print progress( index,  len(packagesToDownload), msg ),
+        print(progress( index,  len(packagesToDownload), msg )),
         index += 1
-    print progress( index,  len(packagesToDownload), msg )
+    print(progress( index,  len(packagesToDownload), msg ))
